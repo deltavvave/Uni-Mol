@@ -61,7 +61,7 @@ class MolDataReader(object):
         
         elif isinstance(data, list) or isinstance(data, np.ndarray):
             # load from smiles list
-            data = pd.DataFrame(data, columns=['SMILES'])
+            data = pd.DataFrame(data, columns=[smiles_col])
         else:
             raise ValueError('Unknown data type: {}'.format(type(data)))
         

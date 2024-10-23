@@ -176,6 +176,8 @@ class UniMolModel(nn.Module):
             _,
             _,
             _,
+            attn_weights,
+            attn_probs
         ) = self.encoder(x, padding_mask=padding_mask, attn_mask=graph_attn_bias)
         cls_repr = encoder_rep[:, 0, :]  # CLS token repr
         all_repr = encoder_rep[:, :, :]  # all token repr
@@ -209,7 +211,7 @@ class UniMolModel(nn.Module):
             return {'cls_repr': cls_repr}  
 
         logits = self.classification_head(cls_repr)
-        return logits
+        return logits, attn_weights, attn_probs
 
     def batch_collate_fn(self, samples):
         """

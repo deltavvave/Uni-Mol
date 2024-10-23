@@ -360,10 +360,10 @@ class TransformerEncoderWithPair(nn.Module):
         assert attn_mask is not None
         attn_mask, padding_mask = fill_attn_mask(attn_mask, padding_mask)
         for i in range(len(self.layers)):
-            x, attn_mask, _ = self.layers[i](
+            x, attn_mask, attn_probs = self.layers[i](
                 x, padding_mask=padding_mask, attn_bias=attn_mask, return_attn=True
             )
-
+            attn_weights = attn_mask
         def norm_loss(x, eps=1e-10, tolerance=1.0):
             x = x.float()
             max_norm = x.shape[-1] ** 0.5
@@ -406,4 +406,4 @@ class TransformerEncoderWithPair(nn.Module):
         if self.final_head_layer_norm is not None:
             delta_pair_repr = self.final_head_layer_norm(delta_pair_repr)
 
-        return x, attn_mask, delta_pair_repr, x_norm, delta_pair_repr_norm
+        return x, attn_mask, delta_pair_repr, x_norm, delta_pair_repr_norm, attn_weights, attn_probs

@@ -1,6 +1,8 @@
+import sys
+from pathlib import Path
 from unimol_tools.unimol_tools import MolPredict
 import numpy as np
-
+from attn_plot import plot_attention_on_molecule
 pesticide_type_dict = {0: 'Fungicide',
                        1: 'Herbicide', 
                        2: 'Insecticide', 
@@ -26,7 +28,7 @@ def select_model(model_name):
     if model_name == 'pest':
         predictor = MolPredict(load_model='../pest')
     elif model_name == 'human':
-        predictor = MolPredict(load_model='../human')
+        predictor = MolPredict(load_model='/Users/atabeyunlu/pesticide_data/tox_pest_pred_results/human')
     elif model_name == 'eco':
         predictor = MolPredict(load_model='../eco')
     elif model_name == 'env':
@@ -66,17 +68,19 @@ def map_labels(labels, model_name):
     predicted_categories = [label_dict[label] for label in labels]
     return predicted_categories
 
-def main():
+def main(attn_map=None):
     smiles_input = input("Enter SMILES string or list of SMILES strings: ")
     model_name = input("Enter model name (pest, human, eco, env): ")
     predictor = select_model(model_name)
     data = prepare_input(smiles_input)
-    predictions = predictor.predict(data=data)
+    predictions, attn_weights, attn_probs = predictor.predict(data=data)
     labels = np.argmax(predictions, axis=1)
     predicted_categories = map_labels(labels, model_name)
     #zip the predicted categories with the smiles input
-    zipped_data = list(zip(predicted_categories, data))
-    print(zipped_data)
+    if attn_map:
+        plot_attention_on_molecule(attn_probs, data, predictions, predicted_categories)
+    return data, predictions, predicted_categories, attn_weights, attn_probs
+
 
 if __name__ == "__main__":
     main()

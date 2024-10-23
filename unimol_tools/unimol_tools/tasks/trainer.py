@@ -315,7 +315,7 @@ class Trainer(object):
             net_input, net_target = self.decorate_batch(batch, feature_name)
             # Get model outputs
             with torch.no_grad():
-                outputs = model(**net_input)
+                outputs, attn_weights, attn_probs = model(**net_input)
                 if not load_model:
                     loss = loss_func(outputs, net_target)
                     val_loss.append(float(loss.data))
@@ -344,7 +344,7 @@ class Trainer(object):
             metric_score = self.metrics.cal_metric(
                 y_truths, y_preds, label_cnt=label_cnt) if not load_model else None
         batch_bar.close()
-        return y_preds, val_loss, metric_score
+        return y_preds, val_loss, metric_score, attn_weights, attn_probs
 
     def inference(self, model, dataset, return_repr=False, return_atomic_reprs=False, feature_name=None):
         """

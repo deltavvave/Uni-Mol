@@ -67,6 +67,8 @@ class MolPredict(object):
         self.model.evaluate(self.trainer, self.load_model)
 
         y_pred = self.model.cv['test_pred']
+        attn_weights = self.model.cv['attn_weights']
+        attn_probs = self.model.cv['attn_probs']
         scalar = self.datahub.data['target_scaler']
         if scalar is not None:
             y_pred = scalar.inverse_transform(y_pred)
@@ -99,7 +101,7 @@ class MolPredict(object):
             self.save_predict(df, self.save_path, prefix)
             logger.info("pipeline finish!")
 
-        return y_pred
+        return y_pred, attn_weights, attn_probs
     
     def save_predict(self, data, dir, prefix):
         """

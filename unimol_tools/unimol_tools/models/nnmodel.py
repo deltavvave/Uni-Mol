@@ -209,13 +209,15 @@ class NNModel(object):
             model_path = os.path.join(checkpoints_path, f'model_{fold}.pth')
             self.model.load_state_dict(torch.load(
                 model_path, map_location=self.trainer.device)['model_state_dict'])
-            _y_pred, _, __ = trainer.predict(self.model, testdataset, self.loss_func, self.activation_fn,
+            _y_pred, _, __, attn_weights, attn_probs = trainer.predict(self.model, testdataset, self.loss_func, self.activation_fn,
                                              self.save_path, fold, self.target_scaler, epoch=1, load_model=True)
             if fold == 0:
                 y_pred = np.zeros_like(_y_pred)
             y_pred += _y_pred
         y_pred /= self.splitter.n_splits
         self.cv['test_pred'] = y_pred
+        self.cv['attn_weights'] = attn_weights
+        self.cv['attn_probs'] = attn_probs
 
     def count_parameters(self, model):
         """
