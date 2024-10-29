@@ -2,7 +2,8 @@ import sys
 from pathlib import Path
 from unimol_tools.unimol_tools import MolPredict
 import numpy as np
-from attn_plot import plot_attention_on_molecule
+from attn_plot import get_attention_scores
+
 pesticide_type_dict = {0: 'Fungicide',
                        1: 'Herbicide', 
                        2: 'Insecticide', 
@@ -78,8 +79,10 @@ def main(attn_map=None):
     predicted_categories = map_labels(labels, model_name)
     #zip the predicted categories with the smiles input
     if attn_map:
-        plot_attention_on_molecule(attn_probs, data, predictions, predicted_categories)
-    return data, predictions, predicted_categories, attn_weights, attn_probs
+        mol, resized_attn, atom_highlights, atom_symbols, num_atoms, highlight_attentions = get_attention_scores(attn_probs, smiles_input)
+        return data, predictions, predicted_categories, attn_weights, attn_probs, mol, resized_attn, atom_highlights, atom_symbols, num_atoms, highlight_attentions
+    else:
+        return data, predictions, predicted_categories, attn_weights, attn_probs
 
 
 if __name__ == "__main__":
